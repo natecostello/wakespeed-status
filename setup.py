@@ -23,6 +23,7 @@ setuptools.setup(
     py_modules=['wakespeed'],
     python_requires=">=3.6",
     install_requires=[
+        "python-can",
         "instrument_logger-NSC @ git+https://github.com/natecostello/instrument_logger.git"]
 )
 # In the install_requires values, the name @ address, name must match the name listed in the dependancy module
