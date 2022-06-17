@@ -16,7 +16,6 @@ try:
     
     logger = InstrumentLogger()
     logger.addinstrument(wsm)
-    wsm.start()
     sleep(3)
 
     logger.start()

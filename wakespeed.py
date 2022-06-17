@@ -20,8 +20,13 @@ RVC_SHIFT = 8
 
 #J1939 Status
 ALTERNATOR_INFORMATION_MESSAGE =            0xFED5
+J1939_MASK = 0b00000111111111111111100000000
+J1939_SHIFT = 8
 
 #NMEA-2000
+NMEA_MASK = 0b00001111111111111111100000000
+NMEA_SHIFT = 8
+
 NMEA_ENGINE_PARAMETERS_RAPID_UPDATE =       0x1F200
 NMEA_DC_DETAILED_STATUS =                   0x1F212
 NMEA_CHARGER_STATUS =                       0x1F213
@@ -48,8 +53,14 @@ class WakespeedMonitor(Listener, Instrument):
         #RC-V CHARGER STATUS_2
         #self.charger_priority = 0
         self.charging_voltage = 0
-        self.charging_current = 0
+        #self.charging_current = 0
         self.charger_temperature = 0
+
+        #J1939 ALTERNATOR_INFORMATION_MESSAGE
+        self.alternator_speed = 0
+
+        #NMEA ENGINE_PARAMETERS_RAPID_UPDATE
+        self.engine_speed = 0
 
 
     @property
@@ -80,8 +91,12 @@ class WakespeedMonitor(Listener, Instrument):
             
             #self.name + '.Charter Priority.integer'
             self.name + '.CV.V',
-            self.name + '.CC.A',
-            self.name + '.Alternator Temperature.C']
+            #self.name + '.CC.A',
+            self.name + '.Alternator Temperature.C',
+
+            self.name + '.Alternator Speed.RPM',
+
+            self.name + '.Engine Speed.RPM']
     
     def getmeasurement(self, name: str) -> str:
         """Required for Instrument"""
@@ -95,10 +110,14 @@ class WakespeedMonitor(Listener, Instrument):
         #     return str(self.force_charge)
         if (name == self.name + '.CV.V'):
             return str(self.charging_voltage)
-        if (name == self.name + '.CC.A'):
-            return str(self.charging_current)
+        # if (name == self.name + '.CC.A'):
+        #     return str(self.charging_current)
         if (name == self.name + '.Alternator Temperature.C'):
             return str(self.charger_temperature)
+        if (name == self.name + '.Alternator Speed.RPM'):
+            return str(self.alternator_speed)
+        if (name == self.name + '.Engine Speed.RPM'):
+            return str(self.engine_speed)
 
 
     def on_message_received(self, msg):
@@ -120,8 +139,22 @@ class WakespeedMonitor(Listener, Instrument):
             
         if dgn == CHARGER_STATUS_2:
             self.charging_voltage = round(0.05 * int.from_bytes(message.data[3:5], 'little'), 2)
-            self.charging_current = round(-1600 + 0.05 * int.from_bytes(message.data[5:7], 'little'), 2)
-            self.charger_temperature = round(1.0 * int.from_bytes(message.data[7], 'little'), 1)
+            # self.charging_current = round(-1600 + 0.05 * int.from_bytes(message.data[5:7], 'little'), 2)
+            self.charger_temperature = round(-40 + 1.0 * message.data[7], 1)
+
+        #Extract J1939 PGN
+        pgn = (message.arbitration_id & J1939_MASK) >> J1939_SHIFT
+
+        if pgn == ALTERNATOR_INFORMATION_MESSAGE:
+            self.alternator_speed = round(0.5 * int.from_bytes(message.data[0:2], 'little'), 1)
+
+        #Extract NMEA PGN
+        pgn = (message.arbitration_id & NMEA_MASK) >> NMEA_SHIFT
+
+        if pgn == NMEA_ENGINE_PARAMETERS_RAPID_UPDATE:
+            self.engine_speed = round(0.25 * int.from_bytes(message.data[1:3], 'little'), 2)
+
+
                 
         # if message.arbitration_id == BATTERY_VOLT_CURRENT_TEMP_ID:
         #     self.battery_voltage = round(0.01 * int.from_bytes(message.data[0:2], 'little'), 2)
