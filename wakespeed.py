@@ -7,6 +7,7 @@ from instrument_logger import Instrument
 # https://www.ceniehoff.com/Documents/Ctrl_Hyperlink/TG39_uid252021133122.pdf
 # https://tajhizkala.ir/doc/SAE/SAE-J1939-2007.pdf
 # https://continuouswave.com/whaler/reference/PGN.html
+# https://github.com/ttlappalainen/NMEA2000
 
 #RV-C
 CHARGER_STATUS =                            0x1FFC7
@@ -18,7 +19,14 @@ DM_RV =                                     0x1FECA
 ALTERNATOR_INFORMATION_MESSAGE =            0xFED5
 
 #NMEA-2000
-ENGINE_PARAMETERS_RAPID_UPDATE =            0x1F200
+NMEA_ENGINE_PARAMETERS_RAPID_UPDATE =       0x1F200
+NMEA_DC_DETAILED_STATUS =                   0x1F212
+NMEA_CHARGER_STATUS =                       0x1F213
+NMEA_BATTERY_STATUS =                       0x1F214
+NMEA_CHARGER_CONFIGURATION_STATUS =         0x1F216
+NMEA_BATTERY_CONFIGURATION_STATUS =         0x1F219
+NMEA_CONVERTER_STATUS =                     0x1F306
+
 
 
 class WakespeedMonitor(Listener, Instrument):
