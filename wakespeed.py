@@ -62,6 +62,11 @@ class WakespeedMonitor(Listener, Instrument):
         #NMEA ENGINE_PARAMETERS_RAPID_UPDATE
         self.engine_speed = 0
 
+        #NMEA CHARGER_CONFIGURATION_STATUS
+        # #traditionally current command limit %, but wakespeed uses for field drive
+        # https://github.com/victronenergy/venus/issues/779#issuecomment-773434948
+        self.field_drive = 0 
+
 
     @property
     def name(self) -> str:
@@ -96,7 +101,9 @@ class WakespeedMonitor(Listener, Instrument):
 
             self.name + '.Alternator Speed.RPM',
 
-            self.name + '.Engine Speed.RPM']
+            self.name + '.Engine Speed.RPM',
+
+            self.name + '.Field Drive.%']
     
     def getmeasurement(self, name: str) -> str:
         """Required for Instrument"""
@@ -118,6 +125,8 @@ class WakespeedMonitor(Listener, Instrument):
             return str(self.alternator_speed)
         if (name == self.name + '.Engine Speed.RPM'):
             return str(self.engine_speed)
+        if (name == self.name + '.Field Drive.%'):
+            return str(self.field_drive)
 
 
     def on_message_received(self, msg):
@@ -153,6 +162,11 @@ class WakespeedMonitor(Listener, Instrument):
 
         if pgn == NMEA_ENGINE_PARAMETERS_RAPID_UPDATE:
             self.engine_speed = round(0.25 * int.from_bytes(message.data[1:3], 'little'), 2)
+        
+        if pgn == NMEA_CHARGER_CONFIGURATION_STATUS:
+            if message.data[5] != 0xFF:
+                self.field_drive = round(1.0 * message.data[5])
+
 
 
                 
