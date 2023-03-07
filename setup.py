@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="wakespeed-NSC",  # Replace with your own username
-    version="0.0.2",
+    version="0.0.3",
     author="Nate Costello",
     author_email="natecostello@gmail.com",
     description="A package that collects information from a Wakespeed",
