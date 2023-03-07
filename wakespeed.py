@@ -53,7 +53,7 @@ class WakespeedMonitor(Listener, Instrument):
         #RC-V CHARGER STATUS_2
         #self.charger_priority = 0
         self.charging_voltage = 0
-        #self.charging_current = 0
+        self.charging_current = 0
         self.charger_temperature = 0
 
         #J1939 ALTERNATOR_INFORMATION_MESSAGE
