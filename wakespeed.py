@@ -96,7 +96,7 @@ class WakespeedMonitor(Listener, Instrument):
             
             #self.name + '.Charter Priority.integer'
             self.name + '.CV.V',
-            #self.name + '.CC.A',
+            self.name + '.CC.A',
             self.name + '.Alternator Temperature.C',
 
             self.name + '.Alternator Speed.RPM',
@@ -117,8 +117,8 @@ class WakespeedMonitor(Listener, Instrument):
         #     return str(self.force_charge)
         if (name == self.name + '.CV.V'):
             return str(self.charging_voltage)
-        # if (name == self.name + '.CC.A'):
-        #     return str(self.charging_current)
+        if (name == self.name + '.CC.A'):
+            return str(self.charging_current)
         if (name == self.name + '.Alternator Temperature.C'):
             return str(self.charger_temperature)
         if (name == self.name + '.Alternator Speed.RPM'):
@@ -148,7 +148,7 @@ class WakespeedMonitor(Listener, Instrument):
             
         if dgn == CHARGER_STATUS_2:
             self.charging_voltage = round(0.05 * int.from_bytes(message.data[3:5], 'little'), 2)
-            # self.charging_current = round(-1600 + 0.05 * int.from_bytes(message.data[5:7], 'little'), 2)
+            self.charging_current = round(-1600 + 0.05 * int.from_bytes(message.data[5:7], 'little'), 2)
             self.charger_temperature = round(-40 + 1.0 * message.data[7], 1)
 
         #Extract J1939 PGN
